@@ -14,8 +14,9 @@
 # limitations under the License.
 ######################################################################
 
-# pylint: disable=function-redefined, missing-function-docstring
+# pylint: disable=function-redefined, missing-function-docstring, import-error
 # flake8: noqa
+
 """
 Web Steps
 
@@ -31,7 +32,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 ID_PREFIX = 'product_'
-
+BUTTON_SUFFIX = '-btn'
 
 @when('I visit the "Home Page"')
 def step_impl(context):
@@ -56,6 +57,7 @@ def step_impl(context, element_name, text_string):
     element = context.driver.find_element(By.ID, element_id)
     element.clear()
     element.send_keys(text_string)
+    assert(element.get_attribute('value') == text_string)
 
 @when('I select "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
@@ -73,7 +75,7 @@ def step_impl(context, text, element_name):
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
     element = context.driver.find_element(By.ID, element_id)
-    assert(element.get_attribute('value') == u'')
+    assert(element.get_attribute('value') == '')
 
 ##################################################################
 # These two function simulate copy and paste
@@ -104,7 +106,39 @@ def step_impl(context, element_name):
 # to get the element id of any button
 ##################################################################
 
-## UPDATE CODE HERE ##
+@when('I press the "{element_name}" button')
+def step_impl(context, element_name):
+    button_id = element_name.lower() + BUTTON_SUFFIX
+    element = context.driver.find_element(By.ID, button_id)
+    element.click()
+
+@then('I should see the message "{message}"')
+def step_impl(context, message):
+    element_id = "flash_message"
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element((By.ID, element_id), message)
+    )
+    assert(found)
+    
+@when('I change the "{element_name}" to "{element_value}"')
+def step_impl(context, element_name, element_value):
+    element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
+    element = context.driver.find_element(By.ID, element_id)
+    element.clear()
+    element.send_keys(element_value)
+
+@then('I should see "{name}" in the results')
+def step_impl(context, name):
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element((By.ID, "search_results"), name)
+    )
+    assert(found)
+
+
+@then('I should not see "{name}" in the results')
+def step_impl(context, name):
+    element = context.driver.find_element(By.ID, 'search_results')
+    assert(name not in element.text)
 
 ##################################################################
 # This code works because of the following naming convention:
