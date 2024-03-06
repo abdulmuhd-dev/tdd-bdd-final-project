@@ -59,7 +59,6 @@ class TestProductRoutes(TestCase):
         # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        #init_db(app)
 
     @classmethod
     def tearDownClass(cls):
@@ -177,16 +176,14 @@ class TestProductRoutes(TestCase):
         self.assertEqual(data['available'], test_product.available)
         self.assertEqual(Decimal(data['price']), test_product.price)
         self.assertEqual(data['category'], test_product.category.name)
-        
-    
+
     def test_get_product_not_found(self):
         """It should return 404 status code for non existed product
         """
         product_id = 0
         response = self.client.get(f'{BASE_URL}/{product_id}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
-    
+
     def test_update_product(self):
         """It should update product
         """
@@ -199,7 +196,7 @@ class TestProductRoutes(TestCase):
         updated_product = response.get_json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(updated_product['description'], new_description)
-        
+
     def test_update_prodcut_not_found(self):
         """it should return 404 for non existed product
         """
@@ -211,7 +208,7 @@ class TestProductRoutes(TestCase):
         product_id = 0
         response = self.client.put(f'{BASE_URL}/{product_id}', json=test_product)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     def test_delete_product(self):
         """It should delete a product
         """
@@ -224,14 +221,14 @@ class TestProductRoutes(TestCase):
         # assert product does not exist
         find_product_res = self.client.get(f'{BASE_URL}/{test_product.id}')
         self.assertEqual(find_product_res.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     def test_delete_product_not_found(self):
         """It should return 404 status code for non existed product
         """
         product_id = 0
         response = self.client.delete(f'{BASE_URL}/{product_id}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     def test_get_product_list(self):
         """It should return list of products
         """
@@ -240,7 +237,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         products = response.get_json()
         self.assertEqual(len(products), len(test_products))
-    
+
     def test_query_by_name(self):
         """It should retrieve products by name
         """
@@ -255,7 +252,7 @@ class TestProductRoutes(TestCase):
         # Check if desired product is returned
         for res_product in res_products:
             self.assertEqual(res_product['name'], product.name)
-        
+
     def test_query_by_category(self):
         """It should retrieve products by category
         """
@@ -270,20 +267,20 @@ class TestProductRoutes(TestCase):
         # Check if desired product is returned
         for res_product in res_products:
             self.assertEqual(res_product['category'], category.name)
-        
+
     def test_query_by_availability(self):
         """It should return products by availablity
         """
         test_products = self._create_products(5)
         available = test_products[0].available
-        count_availibilty = len([prd for prd in test_products if prd.available == available])                   
+        count_availibilty = len([prd for prd in test_products if prd.available == available])
         response = self.client.get(f'{BASE_URL}?available={available}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         products = response.get_json()
         self.assertEqual(count_availibilty, len(products))
         for product in products:
-            self.assertEqual(product['available'] , available)
-    
+            self.assertEqual(product['available'], available)
+
     ######################################################################
     # Utility functions
     ######################################################################

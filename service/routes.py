@@ -126,6 +126,7 @@ def list_products():
 # R E A D   A   P R O D U C T
 ######################################################################
 
+
 @app.route('/products/<int:product_id>', methods=['GET'])
 def get_products(product_id):
     """Retrieve a single product
@@ -133,19 +134,17 @@ def get_products(product_id):
     Args:
         product_id (int): id of the product to retrieve from the url
     """
-    app.logger.info(f'Requesting to retrieve product with id [{product_id}]')
+    app.logger.info('Requesting to retrieve product with id [%s]', product_id)
     product = Product.find(product_id)
     if not product:
-        abort(status.HTTP_404_NOT_FOUND, f'cannot find product with id {product_id}')
-    app.logger.info(f'product with id [{product_id}] retrieved')
+        abort(status.HTTP_404_NOT_FOUND, 'cannot find product with id [%s]', product_id)
+    app.logger.info('product with id [%s] retrieved', product_id)
     return product.serialize(), status.HTTP_200_OK
-    
-
-
 
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
+
 
 @app.route('/products/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
@@ -159,17 +158,16 @@ def update_product(product_id):
     product = Product.find(product_id)
     if not product:
         abort(status.HTTP_404_NOT_FOUND, f'Cannot find product with id {product_id}')
-        
     new_data = request.get_json()
-    update_product = product.deserialize(new_data)
-    update_product.update()
-    updated_product = update_product.serialize()
-    
+    update_prod = product.deserialize(new_data)
+    update_prod.update()
+    updated_product = update_prod.serialize()
     return updated_product, status.HTTP_200_OK
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
+
 
 @app.route('/products/<int:product_id>', methods=['DELETE'])
 def delete_products(product_id):
